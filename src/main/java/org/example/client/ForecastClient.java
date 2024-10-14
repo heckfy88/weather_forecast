@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.api.WeatherForecastDto;
 import org.example.exception.UnsuccessfulResponseCodeException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
@@ -16,9 +14,6 @@ import java.util.Map;
 
 
 public class ForecastClient {
-
-    private static final Logger logger = LoggerFactory.getLogger(ForecastClient.class);
-
     private static final String YANDEX_WEATHER_API_URL = "https://api.weather.yandex.ru/v2/forecast";
     private static final String YANDEX_WEATHER_API_KEY = "API_KEY";
     private static final ObjectMapper objectMapper =
@@ -36,18 +31,13 @@ public class ForecastClient {
     }
 
     public static String getResponseString(Map<String, String> parameters) throws IOException, InterruptedException {
-        HttpResponse<String> payload;
-        try {
-            payload = client.send(prepareRequest(parameters), HttpResponse.BodyHandlers.ofString());
-            if (payload.statusCode() != 200) {
-                throw new UnsuccessfulResponseCodeException(
-                        "Unsuccessful response code from Yandex Weather API: %s".formatted(payload.statusCode())
-                );
-            }
-        } catch (Exception e) {
-            logger.info("Unsuccessful request to Yandex Weather API: %s".formatted(e.getMessage()));
-            throw e;
+        HttpResponse<String> payload = client.send(prepareRequest(parameters), HttpResponse.BodyHandlers.ofString());
+        if (payload.statusCode() != 200) {
+            throw new UnsuccessfulResponseCodeException(
+                    "Unsuccessful response code from Yandex Weather API: %s".formatted(payload.statusCode())
+            );
         }
+
         return payload.body();
     }
 
